@@ -1,0 +1,52 @@
+.trivia-container {
+    text-align: center;
+    background: #FF4E50;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #F9D423, #FF4E50);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #F9D423, #FF4E50); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    height: 100vh;
+    margin: 0;
+    animation-delay: 1s;
+    animation: show-animation 2s linear;
+}
+
+h3.timer-h3 {
+    width: 15px;
+    height: 15px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.form-check {
+    width: auto;
+    border: 1px solid black;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.form-check.response-checked.disabled > .form-check-label{
+    color: white !important;
+}
+.form-check:not( input:disabled ):hover {
+    padding: 2px;
+}
+.form-check > label {
+    width: 100%;
+    height: 100%;
+    padding: 7px;
+    cursor: pointer;
+}
+.form-check > input {
+    display: none;
+}
+.form-check.response-checked {
+    background-color: darkcyan;
+    color: white;
+}
+
+@keyframes show-animation {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
