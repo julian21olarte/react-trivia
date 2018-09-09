@@ -12,18 +12,31 @@ class Trivia extends React.Component {
     render() {
         const { user, list, time, responseClick } = this.props;
         return (
-            <div id="trivia" className="container-fluid trivia-container w-100">
-                <div className="row">
-                    <div className="col-4">
-                        <h1 className="p-5 text-light">{user.nickname}</h1>
+            <div id="trivia" className="container-fluid trivia-container w-100 pb-3">
+                {/* Desktop block */}   
+                <div className="row d-none d-md-flex">
+                     <div className="col-4 text-center">
+                        <p className="p-5 text-light h6 text-center">{user.nickname}</p>
                     </div>
                     <div className="col-4 d-flex justify-content-center align-items-center">
-                        <h3 className="timer-h3 p-5 text-success d-flex justify-content-center align-items-center">{time}</h3>
+                        <p className="timer-h3 p-5 h3 text-success d-flex justify-content-center align-items-center">{time}</p>
                     </div>
-                    <div className="col-4">
-                        <h1 className="p-5 text-light">Computer</h1>
+                    <div className="col-4 text-center">
+                        <p className="p-5 h6 text-light">Computer</p>
                     </div>
                 </div>
+                {/* Mobile block */}
+                <div className="row d-md-none">
+                    <div className="col-12 text-center d-flex justify-content-between align-items-center">
+                        <div className="py-5 text-light">{user.nickname}</div>
+                        <div className="py-5 text-light">Computer</div>
+                    </div>
+                    <div className="col-12 d-flex justify-content-center align-items-center">
+                        <p className="timer-h3 p-5 h3 text-success d-flex justify-content-center align-items-center">{time}</p>
+                    </div>
+
+                </div>
+
                 <div className="row">
                     <div className="col">
                         <div className="card">
@@ -78,6 +91,9 @@ class Trivia extends React.Component {
     componentWillMount() {
         this.props.runTime();
     }
+    componentWillUnmount() {
+        this.props.clearRunTime();
+    }
 }
 
 const disableResponses = () => {
@@ -94,60 +110,64 @@ const mapStateToProps = (state) => {
     return {
         list: state.list,
         text: state.text,
-        user: state.userData,
+        user: state.userData ? state.userData : {nickname: 'Default User'},
         time: state.time
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
-    return {
 
-        runTime: () => {
-            let second = 9;
-            // random number for computer response second
-            const min = 0;
-            const max = 10;
-            const cpuResponseSecond = Math.floor(Math.random() * (max - min)) + min;
+    let interval = null;
 
-            const interval = setInterval(function() {
-                const timerElement = document.querySelector('h3.timer-h3.p-5');
-                if(second === cpuResponseSecond) {
+    const clearRunTime = () => {
+        clearInterval(interval);
+    };
 
-                }
-                if(second === 6) {
-                    timerElement.classList.remove('text-success');
-                    timerElement.classList.add('text-warning');
-                } else  if(second === 3) {
-                    timerElement.classList.remove('text-warning');
-                    timerElement.classList.add('text-danger');
-                }
-                if(!second) {
-                    clearInterval(interval);
-                    disableResponses();
+    const runTime = () => {
+        let second = 9;
+        // random number for computer response second
+        const min = 0;
+        const max = 10;
+        const cpuResponseSecond = Math.floor(Math.random() * (max - min)) + min;
 
-                    second = 'Finish!';
-                    dispatch(finishTime(second));
-                    const selectedValue = document.querySelector('.response-checked > input');
-                    console.log(selectedValue);
-                    const response = selectedValue ? selectedValue.value : null;
-                    console.log(response);
-                } else {
-                    dispatch(decrementTime(second--));
-                }
-            }, 1000);
-        },
+        interval = setInterval(function() {
+            const timerElement = document.querySelector('.timer-h3.p-5');
+            if(second === cpuResponseSecond) {
 
-
-        responseClick: (element) => {
-            console.log(element);
-            const existSelection = document.querySelector('.form-check.disabled');
-            console.log(existSelection);
-            if(!existSelection) {
-                element.target.parentNode.classList.add('response-checked');
-                disableResponses();
             }
-        }
+            if(second === 6) {
+                timerElement.classList.remove('text-success');
+                timerElement.classList.add('text-warning');
+            } else if(second === 3) {
+                timerElement.classList.remove('text-warning');
+                timerElement.classList.add('text-danger');
+            }
+            if(!second) {
+                clearInterval(interval);
+                disableResponses();
 
-    }
+                second = 'Finish!';
+                dispatch(finishTime(second));
+                const selectedValue = document.querySelector('.response-checked > input');
+                console.log(selectedValue);
+                const response = selectedValue ? selectedValue.value : null;
+                console.log(response);
+            } else {
+                dispatch(decrementTime(second--));
+            }
+        }, 1000);
+    };
+
+
+    const responseClick = (element) => {
+        const existSelection = document.querySelector('.form-check.disabled');
+        if(!existSelection) {
+            element.target.parentNode.classList.add('response-checked');
+            disableResponses();
+        }
+    };
+
+    return {clearRunTime, runTime, responseClick};
+
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Trivia);
